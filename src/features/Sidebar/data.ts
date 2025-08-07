@@ -20,24 +20,12 @@ export const adminSeiderBarData = [
     url: "/admin/dashboard",
   },
   {
-    id: "resturant-management",
+    id: generateRandomId(),
     label: "Restaurant",
+    url: "/admin/restaurant/view",
     icon: RestaurantIcon,
-    children: [
-      {
-        id: generateRandomId(),
-        label: "Restaurant",
-        url: "/admin/restaurant/view",
-        icon: RestaurantIcon,
-      },
-      {
-        id: generateRandomId(),
-        label: "Menu Management",
-        url: "/admin/menu/management",
-        icon: SpoonIcon,
-      },
-    ],
   },
+
   {
     id: generateRandomId(),
     label: "Qr Orders",

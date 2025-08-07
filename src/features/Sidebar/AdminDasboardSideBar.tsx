@@ -16,7 +16,6 @@ const AdminDashboardSideBar = ({
   darkMode,
   toggleSidebar,
 }: SidebarProps) => {
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [openMiniMenu, setOpenMiniMenu] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -30,9 +29,9 @@ const AdminDashboardSideBar = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleToggle = (id: string) => {
-    setOpenMenu(openMenu === id ? null : id);
-  };
+  // const handleToggle = (id: string) => {
+  //   setOpenMenu(openMenu === id ? null : id);
+  // };
 
   const handleMiniToggle = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
@@ -121,9 +120,7 @@ const AdminDashboardSideBar = ({
                 e.stopPropagation();
                 toggleDarkMode("dark");
               }}
-              className={`moon  cursor-pointer ${
-                darkMode ? "hidden" : ""
-              }`}
+              className={`moon  cursor-pointer ${darkMode ? "hidden" : ""}`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -184,7 +181,6 @@ const AdminDashboardSideBar = ({
         )}
       </div>
 
-
       {/* Desktop sidebar content */}
       {!isMobile && (
         <div
@@ -196,76 +192,20 @@ const AdminDashboardSideBar = ({
             const Icon = item.icon;
             return (
               <div key={index}>
-                {item.children ? (
-                  <div>
-                    <div
-                      id={item.id}
-                      className={`w-full px-2 py-3 pl-8 flex items-center justify-between cursor-pointer`}
-                      onClick={() => handleToggle(item.id)}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <Icon size={22} color="white" />
-                        <p className="text-base text-white">{item.label}</p>
-                      </div>
-                      <span
-                        className={`transform transition-transform duration-300 ${
-                          openMenu === item.id ? "rotate-180" : ""
-                        }`}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="12"
-                          height="12"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="white"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M6 9l6 6 6-6" />
-                        </svg>
-                      </span>
-                    </div>
-
-                    <div
-                      className={`pl-14 overflow-hidden transition-all duration-300 ease-in-out ${
-                        openMenu === item.id ? "max-h-[500px] p-2" : "max-h-0"
-                      }`}
-                    >
-                      {item.children.map((child) => (
-                        <NavLink
-                          key={child.id}
-                          to={child.url}
-                          className={({ isActive }) =>
-                            `w-full text-white py-3 pl-4 flex items-center space-x-3 ${
-                              isActive
-                                ? "bg-green-700 dark:bg-[#363232]"
-                                : "hover:bg-green-300 dark:hover:bg-[#242424]"
-                            }`
-                          }
-                        >
-                          <p className="text-base text-white">{child.label}</p>
-                        </NavLink>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <NavLink
-                    key={item.id}
-                    to={item.url}
-                    className={({ isActive }) =>
-                      `w-full text-white px-2 py-3 pl-8 flex items-center space-x-3 ${
-                        isActive
-                          ? "bg-green-700 dark:bg-[#363232]"
-                          : "hover:bg-green-300 dark:hover:bg-[#242424]"
-                      }`
-                    }
-                  >
-                    <Icon size={22} color="white" />
-                    <p className="text-base text-white">{item.label}</p>
-                  </NavLink>
-                )}
+                <NavLink
+                  key={item.id}
+                  to={item.url}
+                  className={({ isActive }) =>
+                    `w-full text-white px-2 py-3 pl-8 flex items-center space-x-3 ${
+                      isActive
+                        ? "bg-green-700 dark:bg-[#363232]"
+                        : "hover:bg-green-300 dark:hover:bg-[#242424]"
+                    }`
+                  }
+                >
+                  <Icon size={22} color="white" />
+                  <p className="text-base text-white">{item.label}</p>
+                </NavLink>
               </div>
             );
           })}
@@ -280,92 +220,58 @@ const AdminDashboardSideBar = ({
       >
         {adminSeiderBarData.map((item, index) => {
           const Icon = item.icon;
-          const hasChildren = item.children && item.children.length > 0;
+          // const hasChildren = item.children && item.children.length > 0;
 
           return (
             <div key={index} className="relative">
               <div
-                className={`justify-end pr-5 text-white w-full p-3 flex ${
-                  hasChildren ? "cursor-pointer" : ""
-                }`}
-                onClick={
-                  hasChildren ? (e) => handleMiniToggle(e, item.id) : undefined
-                }
+                className={`justify-end  text-white w-full p-3 flex ${"cursor-pointer"}`}
+                onClick={(e) => handleMiniToggle(e, item.id)}
               >
-                {hasChildren ? (
+                <NavLink
+                  to={item.url || "#"}
+                  className={({ isActive }) =>
+                    `text-white flex items-center ${
+                      isActive
+                        ? "bg-green-700 dark:bg-[#363232] p-[2px] rounded-sm"
+                        : "hover:bg-green-300 dark:hover:bg-[#242424]"
+                    }`
+                  }
+                >
                   <Icon size={22} color="white" />
-                ) : (
-                  <NavLink
-                    to={item.url || "#"}
-                    className={({ isActive }) =>
-                      `text-white flex items-center ${
-                        isActive
-                          ? "bg-green-700 dark:bg-[#363232]"
-                          : "hover:bg-green-300 dark:hover:bg-[#242424]"
-                      }`
-                    }
-                  >
-                    <Icon size={22} color="white" />
-                  </NavLink>
-                )}
+                </NavLink>
 
-                {hasChildren && (
-                  <span
-                    className={`absolute right-1 top-4 transform transition-transform duration-300 ${
-                      openMiniMenu === item.id ? "rotate-180" : ""
-                    }`}
+                {/* <span
+                  className={`absolute right-1 top-4 transform transition-transform duration-300 ${
+                    openMiniMenu === item.id ? "rotate-180" : ""
+                  }`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="10"
+                    height="10"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      height="10"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="white"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M6 9l6 6 6-6" />
-                    </svg>
-                  </span>
-                )}
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </span> */}
               </div>
 
-              {hasChildren && (
-                <div
-                  className={`absolute left-48 top-9 bg-primary border border-gray-300 rounded shadow-lg transition-all duration-300 z-50 ${
-                    openMiniMenu === item.id
-                      ? "opacity-100 visible"
-                      : "opacity-0 invisible"
-                  }`}
-                  style={{ width: "45px" }}
-                >
-                  <div className="py-2">
-                    {item.children.map((child) => {
-                      const Icon = child.icon;
-                      return (
-                        <NavLink
-                          key={child.id}
-                          to={child.url || "#"}
-                          className={({ isActive }) =>
-                            `block px-4 py-2 text-white text-sm hover:bg-green-300 ${
-                              isActive
-                                ? "bg-green-700 dark:bg-[#363232]"
-                                : "hover:bg-green-300 dark:hover:bg-[#242424]"
-                            }`
-                          }
-                        >
-                          <div className="flex items-center gap-2">
-                            {Icon && <Icon size={20} />}
-                          
-                          </div>
-                        </NavLink>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+              {/* <div
+                className={`absolute left-48 top-9 bg-primary border border-gray-300 rounded shadow-lg transition-all duration-300 z-50 ${
+                  openMiniMenu === item.id
+                    ? "opacity-100 visible"
+                    : "opacity-0 invisible"
+                }`}
+                style={{ width: "45px" }}
+              >
+                <div className="py-2"></div>
+              </div> */}
             </div>
           );
         })}

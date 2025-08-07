@@ -16,6 +16,7 @@ import fetchMenusByRestaurant from "./features/Customer Menu/customerMenuSlice";
 import updatePlan from "./features/admin/plan/updatePlanSlice";
 import deletePlan from "./features/admin/plan/deletePlanSlice";
 import notification from "./features/admin/recentActivity/recentActivitySlice";
+import adminAnalyticsReducer from "./features/admin/analytics/adminAnalyticsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -35,6 +36,7 @@ export const store = configureStore({
     updatePlan: updatePlan,
     deletePlan: deletePlan,
     notification: notification,
+    adminAnalytics: adminAnalyticsReducer,
   },
 });
 

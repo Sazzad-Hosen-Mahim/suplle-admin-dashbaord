@@ -2,61 +2,64 @@ import RecentyActivityItem, {
   type RecentItem,
 } from "@/components/admin-panel/dashboard/RecentActivitiyItem";
 import PeopleGroupIcon from "@/components/icons/PeopleGroupIcon";
-import QRIcon from "@/components/icons/QRIcon";
 import SectionHeader from "@/components/ui/sectionHeader";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
+import { fetchAdminAnalytics } from "@/store/features/admin/analytics/adminAnalyticsSlice";
 import { fetchNotifications } from "@/store/features/admin/recentActivity/recentActivitySlice";
 import type { Notification } from "@/Types/notificationTypes";
 import { formatRelativeTime } from "@/utils/time";
 import { generateRandomId } from "@/utils/utils";
 import { useEffect } from "react";
-
-const cardList = [
-  {
-    id: generateRandomId(),
-    label: "Total Users",
-    value: 2340,
-    icon: PeopleGroupIcon,
-    orderBy: "QR",
-  },
-  {
-    id: generateRandomId(),
-    label: "QR Oders",
-    value: 4512,
-    icon: QRIcon,
-    orderBy: "QR",
-  },
-
-  {
-    id: generateRandomId(),
-    label: "Total Restaurant",
-    value: 4512,
-    icon: QRIcon,
-    orderBy: "Outlets",
-  },
-];
+import { IoRestaurant } from "react-icons/io5";
+import { PiChefHatDuotone } from "react-icons/pi";
 
 const AdminDashboardHome = () => {
   const dispatch = useAppDispatch();
 
-  // Adjust the selector to match the actual state shape, e.g. notifications or recentActivity
   const { notifications } = useAppSelector((state) => state.notification);
+  const { data: analyticsData } = useAppSelector(
+    (state) => state.adminAnalytics
+  );
 
   const recentActivityItems: RecentItem[] = notifications.map(
     (n: Notification) => ({
       id: n._id,
-      vendor: n.type === "Qr Order" ? "QR Vendor" : "New User", // customize vendor name if needed
+      vendor: n.type === "Qr Order" ? "QR Vendor" : "New User",
       status: (n.status.charAt(0).toUpperCase() +
-        n.status.slice(1)) as RecentItem["status"], // Capitalize status and cast
-      time: formatRelativeTime(n.createdAt), // we’ll define this next
+        n.status.slice(1)) as RecentItem["status"],
+      time: formatRelativeTime(n.createdAt),
     })
   );
 
   useEffect(() => {
     dispatch(fetchNotifications());
+    dispatch(fetchAdminAnalytics());
   }, [dispatch]);
 
-  console.log(notifications, "notification from admin dashboard home");
+  const cardList = [
+    {
+      id: generateRandomId(),
+      label: "Total Users",
+      value: analyticsData?.totalUsers || 0,
+      icon: PeopleGroupIcon,
+      orderBy: "Users",
+    },
+    {
+      id: generateRandomId(),
+      label: "Total Orders",
+      value: analyticsData?.totalOrders || 0,
+      icon: PiChefHatDuotone,
+      orderBy: "QR",
+    },
+    {
+      id: generateRandomId(),
+      label: "Total Restaurants",
+      value: analyticsData?.totalRestaurants || 0,
+      icon: IoRestaurant,
+      orderBy: "Outlets",
+    },
+  ];
+
   return (
     <div className="space-y-5">
       <div>
@@ -69,7 +72,10 @@ const AdminDashboardHome = () => {
           {cardList.map((card) => {
             const Icon = card.icon;
             return (
-              <div className="flex-1 sm:w-full md:w-1/2 lg:w-1/3 xl:w-1/4 shadow-lg p-6 bg-white dark:bg-[#161616] dark:text-white rounded-lg text-center space-y-3">
+              <div
+                key={card.id}
+                className="flex-1 sm:w-full md:w-1/2 lg:w-1/3 xl:w-1/4 shadow-lg p-6 bg-white dark:bg-[#161616] dark:text-white rounded-lg text-center space-y-3"
+              >
                 <div className="flex justify-center">
                   <div className="bg-[#D1FADF] p-4 rounded-full">
                     <div className="bg-[#b8f4cc] p-[14px] rounded-full">
@@ -91,6 +97,7 @@ const AdminDashboardHome = () => {
           })}
         </div>
       </div>
+
       <div>
         <SectionHeader
           title="Recent Activity"
