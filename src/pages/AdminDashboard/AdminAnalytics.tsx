@@ -1,36 +1,10 @@
 import AdminAnalyticsChart from "@/components/admin-panel/analytics/AdminAnalyticsChart";
 import ArrowUpIcon from "@/components/icons/ArrowUpIcon";
 import SectionHeader from "@/components/ui/sectionHeader";
+import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
+import { fetchAdminAnalytics } from "@/store/features/admin/analytics/adminAnalyticsSlice";
 import { generateRandomId } from "@/utils/utils";
-import { useState } from "react";
-
-const cardList = [
-  {
-    id: generateRandomId(),
-    label: "Total Orders",
-    value: 2340,
-    rate: 36,
-  },
-  {
-    id: generateRandomId(),
-    label: "Total Restaurant",
-    value: 4512,
-    rate: 21,
-  },
-
-  {
-    id: generateRandomId(),
-    label: "QR Orders",
-    value: 4512,
-    rate: 56,
-  },
-  {
-    id: generateRandomId(),
-    label: "Total User",
-    value: 4512,
-    rate: 45,
-  },
-];
+import { useEffect, useState } from "react";
 
 const graphFilterList = [
   {
@@ -57,6 +31,36 @@ const graphFilterList = [
 
 const AdminAnalytics = () => {
   const [selectedFilter, setSelectedFilter] = useState("12 months");
+  const { data } = useAppSelector((state) => state.adminAnalytics);
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(fetchAdminAnalytics());
+  }, [dispatch]);
+
+  const cardList = [
+    {
+      id: generateRandomId(),
+      label: "Total Orders",
+      value: data?.totalOrders || 0,
+      rate: 0,
+    },
+    {
+      id: generateRandomId(),
+      label: "Total Restaurants",
+      value: data?.totalRestaurants || 0,
+      rate: 0,
+    },
+    {
+      id: generateRandomId(),
+      label: "Total Users",
+      value: data?.totalUsers || 0,
+      rate: 0,
+    },
+  ];
+
+  console.log("Analytics Data:", data);
   return (
     <div>
       <div className="space-y-5 overflow-hidden">
