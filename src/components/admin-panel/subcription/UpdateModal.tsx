@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import { updateSubscriptionPlan } from "@/store/features/admin/plan/updatePlanSlice";
 import { fetchSubscriptions } from "@/store/features/admin/plan/subscriptionPlan";
+import { toast } from "react-toastify";
 // import SuppleInput from "@/components/Forms/SuppleInput";
 
 interface UpdateModalProps {
@@ -63,21 +64,43 @@ const UpdateModal = ({
 
   const onFormSubmit = async (data: Partial<SubscriptionPlanData>) => {
     try {
+      console.log(data, "update dataaa");
+      const payload = {
+        ...data,
+        price: Number(data.price),
+        maxRestaurants: Number(data.maxRestaurants),
+        maxFloor: Number(data.maxFloor),
+        maxTables: Number(data.maxTables),
+        maxMenu: Number(data.maxMenu),
+        maxUsers: Number(data.maxUsers),
+        maxQRCodes: Number(data.maxQRCodes),
+        features: (data.features || []).filter((f) => f.trim() !== ""),
+      };
+
+      if (!payload.features.length) {
+        toast.error("At least one feature is required.");
+        return;
+      }
       await dispatch(
         updateSubscriptionPlan({
           planId: planData._id, // assuming your planData has an _id field
-          planData: data,
+          planData: payload,
         })
       ).unwrap();
 
       await dispatch(fetchSubscriptions()).unwrap();
+      toast.success("Plan updated successfully!");
 
       // If successful:
       setShowUpdateModal(false);
       // You might want to refresh the plans list or show a success message here
-    } catch (error) {
-      // Handle error (you might want to show an error message)
-      console.error("Failed to update plan:", error);
+    } catch (err: any) {
+      const errorMsg =
+        err.response?.data?.errorSource?.[0]?.message ||
+        err.response?.data?.message ||
+        err.message ||
+        "Something went wrong";
+      toast.error(errorMsg);
     }
   };
 
@@ -113,7 +136,14 @@ const UpdateModal = ({
             control={control}
             rules={{ required: true }}
             render={({ field }) => (
-              <Input {...field} placeholder="Price" type="number" required />
+              <Input
+                {...field}
+                type="number"
+                value={field.value ?? ""}
+                onChange={(e) => field.onChange(Number(e.target.value))}
+                placeholder="Price"
+                required
+              />
             )}
           />
 
@@ -130,8 +160,14 @@ const UpdateModal = ({
                 render={({ field }) => (
                   <Input
                     {...field}
-                    placeholder="Max Restaurants"
                     type="number"
+                    value={field.value ?? ""}
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value === "" ? "" : Number(e.target.value)
+                      )
+                    }
+                    placeholder="Max Restaurants"
                     required
                   />
                 )}

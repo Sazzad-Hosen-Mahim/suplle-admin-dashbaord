@@ -118,7 +118,7 @@ const AdminSubscription = () => {
                   value={form.state}
                   onChange={handleChange}
                   required
-                  className="border rounded px-2 py-1 w-full"
+                  className="border rounded px-2 py-1 w-full dark:bg-primary-dark"
                 >
                   <option value="starter">Starter</option>
                   <option value="pro">Pro</option>
@@ -135,7 +135,7 @@ const AdminSubscription = () => {
                   value={form.target}
                   onChange={handleChange}
                   required
-                  className="border rounded px-2 py-1 w-full"
+                  className="border rounded px-2 py-1 w-full dark:bg-primary-dark"
                 >
                   <option value="restaurant">Restaurant</option>
                   <option value="business">Business</option>
@@ -248,7 +248,7 @@ const AdminSubscription = () => {
                   value={form.billingCycle}
                   onChange={handleChange}
                   required
-                  className="border rounded px-2 py-1 w-full"
+                  className="border rounded px-2 py-1 w-full dark:bg-primary-dark"
                 >
                   <option value="monthly">Monthly</option>
                   <option value="yearly">Yearly</option>

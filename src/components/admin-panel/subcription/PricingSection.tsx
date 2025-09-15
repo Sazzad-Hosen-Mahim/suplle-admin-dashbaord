@@ -34,6 +34,7 @@ const PricingSection: React.FC = () => {
       // Here you would call your API to update the plan
       // For example:
       // await updateSubscriptionPlan(selectedPlan._id, updatedData);
+
       console.log("Updating plan:", selectedPlan._id, updatedData);
 
       // Refresh the subscriptions after update
