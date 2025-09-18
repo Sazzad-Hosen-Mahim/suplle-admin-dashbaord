@@ -1,5 +1,5 @@
 import AdminAnalyticsChart from "@/components/admin-panel/analytics/AdminAnalyticsChart";
-import ArrowUpIcon from "@/components/icons/ArrowUpIcon";
+// import ArrowUpIcon from "@/components/icons/ArrowUpIcon";
 import SectionHeader from "@/components/ui/sectionHeader";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import {
