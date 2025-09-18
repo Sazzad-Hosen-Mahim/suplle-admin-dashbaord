@@ -3,6 +3,7 @@
 import type {
   AdminAnalyticsData,
   AdminAnalyticsState,
+  ChartDataPoint,
 } from "@/Types/adminAnalyticsTypes";
 import {
   createSlice,
@@ -22,7 +23,7 @@ export const fetchAdminAnalytics = createAsyncThunk<
     const response = await axios.get(
       `${
         import.meta.env.VITE_BACKEND_BASE_URL
-      }/admin-analytics/all-admin-analytics`,
+      }/admin-analytics/admin-dashboard-data`,
       {
         headers: {
           Authorization: `${token}`,
@@ -41,18 +42,64 @@ export const fetchAdminAnalytics = createAsyncThunk<
   }
 });
 
+// Chart analytics thunk
+export const fetchAdminChartAnalytics = createAsyncThunk<
+  ChartDataPoint[],
+  { startDate: string; endDate: string; groupBy: string },
+  { rejectValue: string }
+>(
+  "adminAnalytics/fetchAdminChartAnalytics",
+  async (params, { rejectWithValue }) => {
+    try {
+      const token = Cookies.get("accessToken");
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/admin-analytics`,
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+          params: {
+            startDate: params.startDate,
+            endDate: params.endDate,
+            groupBy: params.groupBy,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        return response.data.data;
+      } else {
+        return rejectWithValue(
+          response.data.message || "Failed to fetch chart analytics"
+        );
+      }
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Network error");
+    }
+  }
+);
+
 const initialState: AdminAnalyticsState = {
   loading: false,
   error: null,
   data: null,
+  chartData: [],
+  chartLoading: false,
+  chartError: null,
 };
 
 const adminAnalyticsSlice = createSlice({
   name: "adminAnalytics",
   initialState,
-  reducers: {},
+  reducers: {
+    clearChartData: (state) => {
+      state.chartData = [];
+      state.chartError = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
+      // Dashboard data
       .addCase(fetchAdminAnalytics.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -67,8 +114,25 @@ const adminAnalyticsSlice = createSlice({
       .addCase(fetchAdminAnalytics.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to fetch admin analytics";
+      })
+      // Chart data
+      .addCase(fetchAdminChartAnalytics.pending, (state) => {
+        state.chartLoading = true;
+        state.chartError = null;
+      })
+      .addCase(
+        fetchAdminChartAnalytics.fulfilled,
+        (state, action: PayloadAction<ChartDataPoint[]>) => {
+          state.chartLoading = false;
+          state.chartData = action.payload;
+        }
+      )
+      .addCase(fetchAdminChartAnalytics.rejected, (state, action) => {
+        state.chartLoading = false;
+        state.chartError = action.payload || "Failed to fetch chart analytics";
       });
   },
 });
 
+export const { clearChartData } = adminAnalyticsSlice.actions;
 export default adminAnalyticsSlice.reducer;

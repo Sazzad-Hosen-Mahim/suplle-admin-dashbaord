@@ -30,8 +30,18 @@ export interface AdminAnalyticsData {
   dayWiseWeekStats: DayWiseWeekStat[];
 }
 
+// Add this interface for chart data
+export interface ChartDataPoint {
+  date: string;
+  sales: number;
+  orders: number;
+}
+
 export interface AdminAnalyticsState {
   loading: boolean;
   error: string | null;
   data: AdminAnalyticsData | null;
+  chartData: ChartDataPoint[];
+  chartLoading: boolean;
+  chartError: string | null;
 }

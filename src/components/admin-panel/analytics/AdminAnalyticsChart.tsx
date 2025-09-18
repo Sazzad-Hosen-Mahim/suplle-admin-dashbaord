@@ -6,90 +6,73 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
+  YAxis,
 } from "recharts";
 
-interface Data {
-  month: string;
+interface ChartDataPoint {
+  date: string;
   sales: number;
-  order: number;
+  orders: number;
 }
 
-const data: Data[] = [
-  {
-    month: "Jan",
-    sales: 2400,
-    order: 6000,
-  },
-  {
-    month: "Feb",
-    sales: 9350,
-    order: 5600,
-  },
-  {
-    month: "Mar",
-    sales: 2530,
-    order: 4300,
-  },
-  {
-    month: "Apr",
-    sales: 4550,
-    order: 2560,
-  },
-  {
-    month: "May",
-    sales: 8250,
-    order: 4530,
-  },
+interface Filter {
+  value: string;
+  groupBy: string;
+}
 
-  {
-    month: "Jun",
-    sales: 6550,
-    order: 760,
-  },
-  {
-    month: "Jul",
-    sales: 7550,
-    order: 4230,
-  },
-  {
-    month: "Aug",
-    sales: 6350,
-    order: 4360,
-  },
-  {
-    month: "Sep",
-    sales: 9550,
-    order: 8430,
-  },
-  {
-    month: "Oct",
-    sales: 3550,
-    order: 6310,
-  },
-  {
-    month: "Nov",
-    sales: 7650,
-    order: 3610,
-  },
-  {
-    month: "Dec",
-    sales: 4550,
-    order: 4930,
-  },
-];
+interface AdminAnalyticsChartProps {
+  selectedFilter: Filter;
+  chartData: ChartDataPoint[];
+}
+
+const formatDate = (dateString: string, groupBy: string) => {
+  try {
+    if (groupBy === "month") {
+      // Format as "MMM YY" (e.g., "Sep 25")
+      const date = new Date(dateString + "-01");
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        year: "2-digit",
+      });
+    } else {
+      // Format as "MMM DD" (e.g., "Sep 18")
+      const date = new Date(dateString);
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+    }
+  } catch (error) {
+    return dateString; // Fallback to original string if formatting fails
+  }
+};
 
 const AdminAnalyticsChart = ({
   selectedFilter,
-}: {
-  selectedFilter: string;
-}) => {
-  const filteredData = selectedFilter === "6 months" ? data.slice(0, 6) : data;
+  chartData,
+}: AdminAnalyticsChartProps) => {
+  // Format data for the chart
+  const formattedData = chartData.map((item) => ({
+    ...item,
+    // Format the date based on the grouping
+    formattedDate: formatDate(item.date, selectedFilter.groupBy),
+  }));
+
+  // If no chart data, show empty state
+  if (chartData.length === 0) {
+    return (
+      <div className="h-96 flex items-center justify-center">
+        <p className="text-gray-500">
+          No data available for the selected period
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <ResponsiveContainer height={400}>
+    <ResponsiveContainer width="100%" height={400}>
       <LineChart
-        width={400}
-        height={300}
-        data={filteredData}
+        data={formattedData}
         margin={{
           top: 5,
           right: 30,
@@ -97,23 +80,44 @@ const AdminAnalyticsChart = ({
           bottom: 5,
         }}
       >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="month" />
-        {/* <YAxis /> */}
-        <Tooltip />
+        <CartesianGrid strokeDasharray="3 3" stroke="#E4E4E7" />
+        <XAxis
+          dataKey="formattedDate"
+          tick={{ fill: "#71717A" }}
+          axisLine={{ stroke: "#E4E4E7" }}
+        />
+        <YAxis tick={{ fill: "#71717A" }} axisLine={{ stroke: "#E4E4E7" }} />
+        <Tooltip
+          formatter={(value: number, name: string) => {
+            if (name === "sales") {
+              return [`$${value.toLocaleString()}`, "Sales"];
+            }
+            return [value.toLocaleString(), "Orders"];
+          }}
+          contentStyle={{
+            backgroundColor: "#fff",
+            border: "1px solid #E4E4E7",
+            borderRadius: "6px",
+          }}
+        />
         <Legend />
         <Line
           type="monotone"
           dataKey="sales"
+          name="Sales"
           stroke="#56DAAB"
           strokeWidth={2.5}
-          activeDot={{ r: 8 }}
+          activeDot={{ r: 8, fill: "#56DAAB" }}
+          dot={{ r: 4, fill: "#56DAAB" }}
         />
         <Line
           type="monotone"
-          dataKey="order"
+          dataKey="orders"
+          name="Orders"
           strokeWidth={2.5}
           stroke="#92D7D6"
+          activeDot={{ r: 8, fill: "#92D7D6" }}
+          dot={{ r: 4, fill: "#92D7D6" }}
         />
       </LineChart>
     </ResponsiveContainer>
